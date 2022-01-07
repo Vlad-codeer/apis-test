@@ -1,0 +1,18 @@
+{
+  "owner": "CARLOS..-.",
+  "apikey": "carlos",
+  "hosts_pages": {
+    "Google": {
+      "host":"https://www.google.com/",
+      "search": "imagens"
+    },
+    "YouTube": {
+      "host": "https://www.youtube.com/",
+      "search": "videos and info"
+    },
+    "xvideos": {
+      "host": "https://www.xvideos.com/",
+      "search": "video raw from download"
+    }
+  }
+}

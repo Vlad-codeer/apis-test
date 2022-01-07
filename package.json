@@ -1,0 +1,26 @@
+{
+  "name": "apis-carlos",
+  "version": "1.0.1",
+  "description": "apis para uso manual ou automático",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js"
+  },
+  "keywords": [
+    "api",
+    "search",
+    "automate",
+    "imagens",
+    "pesquisas",
+    "xvideos",
+    "yt-search",
+    "youtube"
+  ],
+  "author": "CARLOS..-.",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.2",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6"
+  }
+}

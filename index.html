@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<html lang="pt-br">
+  <head>
+    <title>Central</title>
+  </head>
+  <body>
+    <h1>BEM VINDO A CENTRAL API</h1>
+    <p>BOM NESSA API EXISTEM 4 ACOPLADAS SAO ELAS: </p>
+    <p>image-search → para pesquisar fotos no google</p>
+    <p>xvideos → para extrair um link raw de um video do xvideos para fazer download, obs: retorna um objeto com alguns dados do video</p>
+    <p>youtube-search → para pesquisar no YouTube, retorna um objeto com varias chaves</p>
+    <h2>COMO USAR</h2>
+    <p>BOM O EXEMPLO É BEM SIMPLES VOU DAR UM EXEMPLO DE COMO USAR A API YOUTUBE, LEMBRANDO TODAS ROTAS EXIGEM UMA APIKEY CUJO O PADRÃO É "carlos", E UMA API EM ESPECÍFICO É A XVIDEOS ELA TEM DUAS APIS UMA PRA PESQUISA E OUTRA PRA EXTRAIR UM LINK RAW COMO JA TINHA DITO ALI ACIMA PRA ELAS TERAR QUE USAR UMA OPÇÃO NA URL PRA ESPECÍFICAR QUAL DELAS VOCÊ IRA USAR AS OPÇÕES SÃO "search" E "download", E O PARÂMETRO A SER PASSADO É "option=search ou option=download"</p>
+    <p>EM FIM VAMOS PARA O EXEMPLO:</p>
+    <p>"http://localhost/3000/api/youtube-search?apikey=carlos&text=teto"</p>
+    <p>O LOCALHOST NÃO TEM IMPORTÂNCIA VAI SER DA MESMA FORMA PRO HEROKU</p>
+  </body>
+</html>
