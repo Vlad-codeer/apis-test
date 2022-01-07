@@ -107,7 +107,7 @@ function xvideos(req, res, apikey) {
         }
         res.send({
           status: true,
-          resultado: data
+          result: data
         });
       });
     };
