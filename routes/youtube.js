@@ -76,7 +76,7 @@ function youtube(req, res, apikey) {
         };
         res.send({
           status: true,
-          result: obj
+          result: [obj]
         });
       } catch (err) {
         res.send({
