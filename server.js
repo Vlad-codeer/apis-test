@@ -2,6 +2,7 @@ const request = require('request');
 const http = require('http');
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 const apikey = JSON.parse(fs.readFileSync('./config.json')).apikey;
@@ -9,7 +10,7 @@ const functions = require('./routes/exports.js');
 const server = http.createServer(app);
 
 app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
+  res.sendFile(path.join(__dirname + '/index.html'));
 });
 
 app.get('/api', (req, res) => {
