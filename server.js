@@ -32,6 +32,10 @@ app.get('/api/youtube-search', (req, res) => {
   functions.youtube(req, res, apikey);
 });
 
+app.get('/api/youtube-downloads', (req, res) => {
+  functions.youtube_download(req, res, apikey);
+});
+
 server.listen(port, () => {
   console.log(`server running in \"http://localhost:${port}\"`);
 });
