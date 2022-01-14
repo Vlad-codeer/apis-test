@@ -5,6 +5,12 @@ const isUrlYoutube = (url) => {
   return valid;
 };
 
+const format_url = (url) => {
+  var id = url.split('/')[url.split('/').length - 1];
+  var format = `https://m.youtube.com/watch?v=${id}&feature=youtu.be`;
+  return format;
+};
+
 function youtube_download(req, res, apikey) {
  var ApiKey = req.query.apikey;
   var url = req.query.url;
@@ -28,7 +34,7 @@ function youtube_download(req, res, apikey) {
     message: 'this url not is of youtube'
   });
   
-  request(uri, (err, req, body) => {
+  request(format_url(uri), (err, req, body) => {
     if (err) return console.log(err);
     try {
       var regex = /var ytInitialPlayerResponse = {"responseContext":{"(.+)}}}};/gi;
