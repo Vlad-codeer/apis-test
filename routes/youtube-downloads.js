@@ -36,7 +36,7 @@ function youtube_download(req, res, apikey) {
   
   request(format_url(uri), (err, req, body) => {
     if (err) return console.log(err);
-    console.log(format_url);
+    console.log(format_url(uri));
     try {
       var regex = /var ytInitialPlayerResponse = {"responseContext":{"(.+)}}}};/gi;
       var json = JSON.parse(body.match(regex)[0].split('var ytInitialPlayerResponse = ').join('').split(';').join(''));
