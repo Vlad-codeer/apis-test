@@ -48,7 +48,7 @@ function youtube(req, res, apikey) {
 
         var views = videos.videoRenderer.viewCountText.simpleText.split(' visualizações').join('').split(',').join('.');
 
-        var url_video = 'https://youtu.be' + _data.videoId;
+        var url_video = 'https://youtu.be/' + _data.videoId;
 
         var name_channel = videos.videoRenderer.ownerText.runs[0].text;
 
