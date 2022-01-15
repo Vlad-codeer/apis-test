@@ -24,6 +24,7 @@ function xvideos(req, res, apikey) {
     status: false,
     message: 'invalid option'
   });
+  
   if (option == 'search') {
     const start = (word) => {
       var normalize = word.split(' ').join('+').split('%20').join('');
