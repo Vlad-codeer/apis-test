@@ -43,7 +43,7 @@ function xvideos(req, res, apikey) {
 
         var regExp2 = /\"\/.+?\"/g;
         var regExp3 = /title=\".+?\">/g;
-        var regExp4 = /\"duration\">.+?/g;
+       // var regExp4 = /\"duration\">.+?/g;
         for (let index of data) {
           var reg = index.match(regExp2);
           var reg2 = index.match(regExp3);
