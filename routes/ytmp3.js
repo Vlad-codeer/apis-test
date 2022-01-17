@@ -1,5 +1,11 @@
 const request = require('request');
 
+const format_url = (url) => {
+  var id = url.split('/')[url.split('/').length - 1];
+  var format = `https://m.youtube.com/watch?v=${id}&feature=youtu.be`;
+  return format;
+};
+
 function ytmp3(req, res, apikey) {
   var ApiKey = req.query.apikey;
   var text = req.query.text;
@@ -81,4 +87,6 @@ function ytmp3(req, res, apikey) {
   start(text);
 }
 
-module.exports = { ytmp3 };
+module.exports = {
+  ytmp3
+};
