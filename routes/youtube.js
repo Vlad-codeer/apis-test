@@ -34,7 +34,7 @@ function youtube(req, res, apikey) {
   });
   const search = (word) => {
     var url = `https://m.youtube.com/results?sp=mAEA&search_query=${word}`;
-    
+
     console.log(url);
     request(url, (err, req, body) => {
       if (err) return console.log(err);
@@ -85,4 +85,6 @@ function youtube(req, res, apikey) {
   search(text);
 }
 
-module.exports = { youtube };
+module.exports = {
+  youtube
+};
