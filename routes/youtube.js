@@ -49,7 +49,7 @@ function youtube(req, res, apikey) {
           results.push({
             title: info.title.runs[0].text,
             source: 'https://youtu.be/' + info.videoId,
-            views: info.viewCountText.simpleText != undefined ? info.viewCountText.simpleText.split(' visualizações').join('') : '',
+            views: info.viewCountText.simpleText != undefined ? info.viewCountText.simpleText.split(' views').join('') : '',
             thumbnail: info.thumbnail.thumbnails[0].url.split('?')[0],
             publication: '',
             duration: info.lengthText.simpleText,
