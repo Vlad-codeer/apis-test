@@ -1,5 +1,22 @@
 const request = require('request');
 
+const formatUrlYTB = (inputUrl) => {
+  var outputUrl;
+  if (inputUrl.startsWith('https://youtube.com/')) {
+    var id = inputUrl.match(/\?v=(.+)/gi)[0].split('?v=')[1];
+    outputUrl = `https://m.youtube.com/watch?v=${id}&feature=youtu.be`;
+  } else if (inputUrl.startsWith('https://youtu.be/')) {
+    var uid = inputUrl.split('/')[inputUrl.split('/').length - 1];
+    outputUrl = `https://m.youtube.com/watch?v=${uid}&feature=youtu.be`;
+  }
+  return outputUrl;
+};
+
+const formatDate = (date) => {
+  var split = date.split('-');
+  return split[split.length - 1] + '/' + split[1] + '/' + split[0];
+};
+
 function youtube(req, res, apikey) {
   var ApiKey = req.query.apikey;
   var text = req.query.text;
@@ -15,78 +32,55 @@ function youtube(req, res, apikey) {
     status: false,
     message: 'text is not defined'
   });
-
-  const start = (word) => {
-    const normalize = word.split(' ').join('+');
-    const search = normalize.normalize('NFD').replace(/[\u0300-\u036f]/gi, '');
-
-    const url = `https://www.youtube.com/results?app=desktop&sp=mAEA&search_query=${search}`;
+  const search = (word) => {
+    var url = `https://m.youtube.com/results?sp=mAEA&search_query=${word}`;
 
     request(url, (err, req, body) => {
       if (err) return console.log(err);
+      var regex = /var ytInitialData = {"responseContext":(.+?)};/gi;
+      var data = JSON.parse(body.match(regex)[0].split('var ytInitialData = ').join('').split(';').join(''));
 
-      var regExp = /= \{\"responseContext\":\{.+?;/g;
-      try {
-        var data = JSON.parse(body.match(regExp)[0].split('= ').join('').split(';').join(''));
+      var results = [];
+      for (let i of data.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents) {
+        if (Object.keys(i)[0] == 'videoRenderer') {
+          var info = i.videoRenderer;
 
-        var infos = data.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents;
-
-        var videos;
-        if (Object.keys(infos[0]) == 'channelRenderer') {
-          videos = infos[2];
-        } else if (Object.keys(infos[0]) == 'videoRenderer') {
-          videos = infos[0];
+          results.push({
+            title: info.title.runs[0].text,
+            source: 'https://youtu.be/' + info.videoId,
+            views: info.viewCountText.simpleText.split(' visualizações').join(''),
+            thumbnail: info.thumbnail.thumbnails[0].url.split('?')[0],
+            publication: '',
+            duration: info.lengthText.simpleText,
+            channel: [{
+              title: info.ownerText.runs[0].text,
+              source: 'https://youtube.com/channel/' + info.ownerText.runs[0].navigationEndpoint.browseEndpoint.browseId,
+              thumbnail: info.channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.thumbnail.thumbnails[0].url.split('=')[0],
+              description: {
+                text: ''
+              }
+            }]
+          });
         }
-
-        var _data = videos.videoRenderer;
-
-        var title = videos.videoRenderer.title.runs[0].text;
-
-        var thumbnail = videos.videoRenderer.thumbnail.thumbnails[0].url;
-
-        var duration = videos.videoRenderer.lengthText.simpleText;
-
-        var views = videos.videoRenderer.viewCountText.simpleText.split(' visualizações').join('').split(',').join('.');
-
-        var url_video = 'https://youtu.be/' + _data.videoId;
-
-        var name_channel = videos.videoRenderer.ownerText.runs[0].text;
-
-        var url_channel = 'https://youtube.com' + videos.videoRenderer.ownerText.runs[0].navigationEndpoint.commandMetadata.webCommandMetadata.url;
-
-        var url_perfil_channel = videos.videoRenderer.channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.thumbnail.thumbnails[0].url.split('=')[0];
-
-        var TimePublished = _data.publishedTimeText.simpleText;
-
-        var ownerId = _data.ownerText.runs[0].navigationEndpoint.browseEndpoint.browseId;
-
-        var obj = {
-          videoId: _data.videoId,
-          title: title,
-          source: url_video,
-          thumbnail: thumbnail,
-          views: views,
-          duration: duration,
-          channel: {
-            channelId: ownerId,
-            name: name_channel,
-            source: url_channel,
-            thumbnail: url_perfil_channel
-          }
-        };
-        res.send({
-          status: true,
-          result: [obj]
-        });
-      } catch (err) {
-        res.send({
-          status: false,
-          resultado: ['not found']
-        });
       }
+
+      request(formatUrlYTB(results[0].source), (err, req, body) => {
+        if (err) return console.log(err);
+        var regex = /var ytInitialPlayerResponse = {"responseContext":{"(.+)}}}};/gi;
+        var json = JSON.parse(body.match(regex)[0].split('var ytInitialPlayerResponse = ').join('').split(';').join(''));
+
+        results[0].publication = formatDate(json.microformat.playerMicroformatRenderer.publishDate);
+
+        results[0].channel[0].description.text = json.microformat.playerMicroformatRenderer.description.simpleText;
+
+        res.json({
+          status: true,
+          result: results[0]
+        });
+      });
     });
   };
-  start(text);
+  search(text);
 }
 
 module.exports = { youtube };
