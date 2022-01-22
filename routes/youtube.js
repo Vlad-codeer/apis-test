@@ -52,7 +52,7 @@ function youtube(req, res, apikey) {
             views: info.viewCountText.simpleText != undefined ? info.viewCountText.simpleText.split(' views').join('') : '',
             thumbnail: info.thumbnail.thumbnails[0].url.split('?')[0],
             publication: '',
-            duration: info.lengthText.simpleText != undefined ? info.lengthText.simpleText : '',
+            duration: info.lengthText.simpleText,
             channel: [{
               title: info.ownerText.runs[0].text,
               source: 'https://youtube.com/channel/' + info.ownerText.runs[0].navigationEndpoint.browseEndpoint.browseId,
