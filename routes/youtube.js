@@ -34,7 +34,8 @@ function youtube(req, res, apikey) {
   });
   const search = (word) => {
     var url = `https://m.youtube.com/results?sp=mAEA&search_query=${word}`;
-
+    
+    console.log(url);
     request(url, (err, req, body) => {
       if (err) return console.log(err);
       var regex = /var ytInitialData = {"responseContext":(.+?)};/gi;
@@ -66,6 +67,7 @@ function youtube(req, res, apikey) {
 
       request(formatUrlYTB(results[0].source), (err, req, body) => {
         if (err) return console.log(err);
+        console.log(formatUrlYTB(results[0].source));
         var regex = /var ytInitialPlayerResponse = {"responseContext":{"(.+)}}}};/gi;
         var json = JSON.parse(body.match(regex)[0].split('var ytInitialPlayerResponse = ').join('').split(';').join(''));
 
