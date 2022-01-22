@@ -45,7 +45,7 @@ function youtube(req, res, apikey) {
       for (let i of data.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents) {
         if (Object.keys(i)[0] == 'videoRenderer') {
           var info = i.videoRenderer;
-
+          console.log('visu aqui: ' + info.viewCountText.simpleText);
           results.push({
             title: info.title.runs[0].text,
             source: 'https://youtu.be/' + info.videoId,
