@@ -13,6 +13,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname + '/pagina-inicial.html'));
 });
 
+app.get('/style.css', (req, res) => {
+ res.sendFile(path.join(__dirname + '/style.css'));
+});
+
 app.get('/api', (req, res) => {
   res.status(200).send({
     status: true,
