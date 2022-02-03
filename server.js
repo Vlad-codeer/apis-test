@@ -10,7 +10,7 @@ const functions = require('./routes/exports.js');
 const server = http.createServer(app);
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname + '/index.html'));
+  res.sendFile(path.join(__dirname + '/pagina-inicial.html'));
 });
 
 app.get('/api', (req, res) => {
