@@ -20,7 +20,7 @@ async function download_instagram(req, res, apikey) {
       cookie: 'csrftoken=Ey5xXoPdlwqeCfBisirixN2CS3o4WYfg; mid=YjSX4wABAAF5h0MEvmrKQQYn0Crq; ig_nrcb=1'
     }});
   let jsonObject = {};
-  try {
+  //try {
     let data = JSON.parse(body.data.match(/window\._sharedData = {(.+)}/gi)[0].replace(/window\._sharedData = /g, ''));
     data.entry_data.PostPage[0].graphql.shortcode_media.is_video ? data.entry_data.PostPage[0].graphql.shortcode_media.is_image = false: data.entry_data.PostPage[0].graphql.shortcode_media.is_image = true;
     if (data.entry_data.PostPage[0].graphql.shortcode_media.is_image) {
@@ -56,12 +56,12 @@ async function download_instagram(req, res, apikey) {
       status: true,
       result: jsonObject
     });
-  } catch (a) {
+  /*} catch (a) {
     res.json({
       status: false,
       erro: true
     });
-  }
+  }*/
 }
 
 module.exports = { download_instagram };
