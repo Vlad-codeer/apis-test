@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-function download_instagram(req, res, apikey) {
+async function download_instagram(req, res, apikey) {
   let ApiKey = req.query.apikey;
   let url = req.query.url;
   if (!ApiKey) return res.send({
@@ -58,12 +58,6 @@ function download_instagram(req, res, apikey) {
       status: true,
       result: jsonObject
     });
-  /*} catch (a) {
-    res.json({
-      status: false,
-      erro: true
-    });
-  }*/
   };
   start(url);
 }
