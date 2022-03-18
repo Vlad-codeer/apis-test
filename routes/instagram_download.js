@@ -59,7 +59,7 @@ async function download_instagram(req, res, apikey) {
       result: jsonObject
     });
   };
-  start(url);
+  await start(url);
 }
 
 module.exports = { download_instagram };
