@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-async function download_instagram(req, res, apikey) {
+function download_instagram(req, res, apikey) {
   let ApiKey = req.query.apikey;
   let url = req.query.url;
   if (!ApiKey) return res.send({
@@ -15,7 +15,9 @@ async function download_instagram(req, res, apikey) {
     status: false,
     message: 'url is not defined'
   });
-  let body = await axios.get(url, {
+  
+  const start = async (uri) => {
+  let body = await axios.get(uri, {
     headers: {
       cookie: 'csrftoken=Ey5xXoPdlwqeCfBisirixN2CS3o4WYfg; mid=YjSX4wABAAF5h0MEvmrKQQYn0Crq; ig_nrcb=1'
     }});
@@ -62,6 +64,8 @@ async function download_instagram(req, res, apikey) {
       erro: true
     });
   }*/
+  };
+  start(url);
 }
 
 module.exports = { download_instagram };
