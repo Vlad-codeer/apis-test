@@ -1,6 +1,6 @@
 {
   "name": "apis-carlos",
-  "version": "1.0.1",
+  "version": "0.0.2",
   "description": "apis para uso manual ou automático",
   "main": "server.js",
   "scripts": {
