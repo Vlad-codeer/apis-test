@@ -1,19 +1,8 @@
-const request = require('request');
-const isUrlYoutube = (url) => {
-  var valid = url.startsWith('https://youtu.be/');
+const axios = require('axios');
 
-  return valid;
-};
-
-const format_url = (url) => {
-  var id = url.split('/')[url.split('/').length - 1];
-  var format = `https://m.youtube.com/watch?v=${id}&feature=youtu.be`;
-  return format;
-}; 
-
-function youtube_download(req, res, apikey) {
- var ApiKey = req.query.apikey;
-  var url = req.query.url;
+async function download_instagram(req, res, apikey) {
+  let ApiKey = req.query.apikey;
+  let url = req.query.url;
   if (!ApiKey) return res.send({
     status: false,
     message: 'apikey not defined'
@@ -26,63 +15,53 @@ function youtube_download(req, res, apikey) {
     status: false,
     message: 'url is not defined'
   });
-  
-  const search = (uri) => {
-  if (!isUrlYoutube(uri)) return res.send({
-    status: false,
-    ivalid_url: uri,
-    message: 'this url not is of youtube'
-  });
-  
-  request(format_url(uri), (err, req, body) => {
-    if (err) return console.log(err);
-    console.log(format_url(uri));
-    try {
-      var regex = /var ytInitialPlayerResponse = {"responseContext":{"(.+)}}}};/gi;
-      var json = JSON.parse(body.match(regex)[0].split('var ytInitialPlayerResponse = ').join('').split(';').join(''));
-      var audio = [];
-      for (let i of json.streamingData.adaptiveFormats) {
-        if (i.mimeType == 'audio/webm codecs="opus"' && i.audioQuality == 'AUDIO_QUALITY_MEDIUM') {
-          audio.push(i.url);
-        }
+  let body = await axios.get(url, {
+    headers: {
+      cookie: 'csrftoken=Ey5xXoPdlwqeCfBisirixN2CS3o4WYfg; mid=YjSX4wABAAF5h0MEvmrKQQYn0Crq; ig_nrcb=1'
+    }});
+  let jsonObject = {};
+  try {
+  let data = JSON.parse(body.data.match(/window\._sharedData = {(.+)}/gi)[0].replace(/window\._sharedData = /g, ''));
+  data.entry_data.PostPage[0].graphql.shortcode_media.is_video ? data.entry_data.PostPage[0].graphql.shortcode_media.is_image = false: data.entry_data.PostPage[0].graphql.shortcode_media.is_image = true;
+  if (data.entry_data.PostPage[0].graphql.shortcode_media.is_image) {
+    let qualities = [];
+    jsonObject.name_for_search = data.entry_data.PostPage[0].graphql.shortcode_media.owner.username;
+    jsonObject.name = data.entry_data.PostPage[0].graphql.shortcode_media.owner.full_name;
+    jsonObject.folowers = data.entry_data.PostPage[0].graphql.shortcode_media.owner.edge_followed_by.count;
+    jsonObject.totalLikes = data.entry_data.PostPage[0].graphql.shortcode_media.edge_media_preview_like.count;
+    jsonObject.totalComments = data.entry_data.PostPage[0].graphql.shortcode_media.edge_media_preview_comment.count;
+    jsonObject.image_caption = data.entry_data.PostPage[0].graphql.shortcode_media.edge_media_to_caption.edges[0].node.text;
+    data.entry_data.PostPage[0].graphql.shortcode_media.display_resources.map(i => {
+      qualities.push(i.config_height);
+      qualities.push(i.config_width);
+    });
+    let maxQuality = qualities.reduce((a, b) => {
+      return Math.max(a, b);
+    }, -Infinity);
+    data.entry_data.PostPage[0].graphql.shortcode_media.display_resources.map(i => {
+      if (i.config_width == maxQuality) {
+        jsonObject.imgUrl = i.src;
       }
-
-      var object = {
-        videoId: json.videoDetails.videoId,
-        title: json.videoDetails.title,
-        durarion: json.microformat.playerMicroformatRenderer.lengthSeconds,
-        views: parseInt(json.microformat.playerMicroformatRenderer.viewCount),
-        publication: json.microformat.playerMicroformatRenderer.publishDate,
-        description: {
-          text: json.microformat.playerMicroformatRenderer.description.simpleText
-        },
-        download: {
-          audio: {
-            url: audio[0]
-          },
-          video: {
-            url: json.streamingData.formats[0].url
-          }
-        },
-        channel: {
-          name: json.microformat.playerMicroformatRenderer.ownerChannelName,
-          url: `https://youtube.com/channel/${json.microformat.playerMicroformatRenderer.externalChannelId}`,
-          category: json.microformat.playerMicroformatRenderer.category
-        }
-      };
-      res.send({
-        status: true,
-        result: [object]
-      });
-    } catch (err) {
-      res.send({
-        status: 404,
-        message: 'video not found'
-      });
-    }
+    });
+  } else if (data.entry_data.PostPage[0].graphql.shortcode_media.is_video) {
+    jsonObject.name_for_search = data.entry_data.PostPage[0].graphql.shortcode_media.owner.username;
+    jsonObject.name = data.entry_data.PostPage[0].graphql.shortcode_media.owner.full_name;
+    jsonObject.folowers = data.entry_data.PostPage[0].graphql.shortcode_media.owner.edge_followed_by.count;
+    jsonObject.totalLikes = data.entry_data.PostPage[0].graphql.shortcode_media.edge_media_preview_like.count;
+    jsonObject.totalComments = data.entry_data.PostPage[0].graphql.shortcode_media.edge_media_preview_comment.count;
+    jsonObject.duration = String(data.entry_data.PostPage[0].graphql.shortcode_media.video_duration).split('.')[0] + ' seconds';
+    jsonObject.videoUrl = data.entry_data.PostPage[0].graphql.shortcode_media.video_url;
+  }
+  res.json({
+    status: true,
+    result: jsonObject
   });
-  };
-  search(url);
+  } catch (a) {
+    res.json({
+      status: false,
+      erro: true
+    });
+  }
 }
 
-module.exports = { youtube_download };
+module.exports = { download_instagram };
