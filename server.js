@@ -40,8 +40,8 @@ app.get('/api/ytmp3', (req, res) => {
   functions.ytmp3(req, res, apikey);
 });
 
-app.get('/api/youtube-downloads', (req, res) => {
-  functions.youtube_download(req, res, apikey);
+app.get('/api/ig-download', (req, res) => {
+  functions.download_instagram(req, res, apikey);
 });
 
 server.listen(port, () => {
