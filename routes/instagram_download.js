@@ -17,10 +17,7 @@ async function download_instagram(req, res, apikey) {
   });
   
   const start = async (uri) => {
-  let body = await axios.get(uri, {
-    headers: {
-      cookie: 'csrftoken=Ey5xXoPdlwqeCfBisirixN2CS3o4WYfg; mid=YjSX4wABAAF5h0MEvmrKQQYn0Crq; ig_nrcb=1'
-    }});
+  let body = await axios.get(uri, {headers: {cookie: 'csrftoken=Ey5xXoPdlwqeCfBisirixN2CS3o4WYfg; mid=YjSX4wABAAF5h0MEvmrKQQYn0Crq; ig_nrcb=1'}});
   let jsonObject = {};
   //try {
     let data = JSON.parse(body.data.match(/window\._sharedData = {(.+)}/gi)[0].replace(/window\._sharedData = /g, ''));
