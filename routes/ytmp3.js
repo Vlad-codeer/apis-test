@@ -1,14 +1,10 @@
-const request = require('request');
+const ytdl = require('ytdl-core');
+const youtube = require('@yimura/scraper');
+const yt = new youtube.default('pt-br');
 
-const format_url = (url) => {
-  var id = url.split('/')[url.split('/').length - 1];
-  var format = `https://m.youtube.com/watch?v=${id}&feature=youtu.be`;
-  return format;
-};
-
-function ytmp3(req, res, apikey) {
-  var ApiKey = req.query.apikey;
-  var text = req.query.text;
+async function ytmp3(req, res, apikey) {
+  const ApiKey = req.query.apikey;
+  const text = req.query.text;
   if (!ApiKey) return res.send({
     status: false,
     message: 'apikey not defined'
@@ -21,70 +17,43 @@ function ytmp3(req, res, apikey) {
     status: false,
     message: 'text is not defined'
   });
-  const start = (word) => {
-    var normalize = word.split('').join('+').split('%20').join('+');
-    var search = normalize.normalize('NFD').replace(/[\u0300-\u036f]/gi, '');
-    var url = `https://www.youtube.com/results?app=desktop&sp=mAEA&search_query=${search}`;
-    var datas = [];
-
-    request(url, (err, req, body) => {
-      if (err) return console.log(err);
-      var regExp = /= \{\"responseContext\":\{(.+?);/g;
-      var data = JSON.parse(body.match(regExp)[0].split('= ').join('').split(';').join(''));
-
-      var video;
-      var ids = [];
-      var thumbnails = {
-        videoThumb: [],
-        channelThumb: []
-      };
-      for (let i of data.contents.twoColumnSearchResultsRenderer.primaryContents.sectionListRenderer.contents[0].itemSectionRenderer.contents) {
-        if (Object.keys(i) == 'videoRenderer') {
-          ids.push(i.videoRenderer.videoId);
-          video = 'https://youtu.be/' + ids[0];
-          thumbnails.videoThumb.push(i.videoRenderer.thumbnail.thumbnails[0]);
-          thumbnails.channelThumb.push(i.videoRenderer.channelThumbnailSupportedRenderers.channelThumbnailWithLinkRenderer.thumbnail.thumbnails[0]);
-        }
+  async function init(querytext) {
+    if (!querytext) throw new Error('text no defined');
+    const data = await yt.search(querytext);
+    const { shareLink } = data.videos[0];
+    const { formats, videoDetails } = await ytdl.getInfo(shareLink);
+    let video = [];
+    let audio = [];
+    formats.map(i => {
+      if (i.videoCodec) {
+        video.push(i.url);
+      } else if (i.audioCodec) {
+        audio.push(i.url);
       }
-      datas.push({
-        video: thumbnails.videoThumb[0].url.split('?')[0],
-        channel: thumbnails.channelThumb[0].url.split('=')[0]
-      });
-      request(format_url(video), (erri, reqi, bodi) => {
-        if (err) return console.log(erri);
-        var regex = /var ytInitialPlayerResponse = {"responseContext":{"(.+)}}}};/gi;
-        var json = JSON.parse(bodi.match(regex)[0].split('var ytInitialPlayerResponse = ').join('').split(';').join(''));
-
-        var audio = [];
-        for (let x of json.streamingData.adaptiveFormats) {
-          if (x.mimeType.startsWith('audio/webm codecs="opus"')) {
-            if (x.hasOwnProperty('url')) {
-              audio.push(x.url);
-            } else if (!x.hasOwnProperty('url')) {
-              audio.push('nothing found, use the search');
-            }
-          }
-        }
-        var object = {
-          videoId: json.videoDetails.videoId,
-          title: json.videoDetails.title,
-          thumbnail: datas[0].video,
-          durarion: json.microformat.playerMicroformatRenderer.lengthSeconds,
-          audio: audio[0],
-          views: parseInt(json.microformat.playerMicroformatRenderer.viewCount),
-          publication: json.microformat.playerMicroformatRenderer.publishDate,
-          description: {
-            text: json.microformat.playerMicroformatRenderer.description.simpleText
-          }
-        };
-        res.send({
-          status: true,
-          result: object
-        });
-      });
     });
-  };
-  start(text);
+    data.videos[0].channel.description = {
+      text: videoDetails.description
+    };
+    return {
+      title: videoDetails.title,
+      source: shareLink,
+      thumbnail: data.videos[0].thumbnail,
+      duration: data.videos[0].duration_raw,
+      uploaded: data.videos[0].uploaded,
+      views: data.videos[0].views,
+      channel: data.videos[0].channel,
+      download: {
+        audio: audio[audio.length -1],
+        video: video[0]
+      },
+      category: videoDetails.category
+    };
+  }
+  let response = await init(text);
+  res.json({
+    status: true,
+    result: response
+  });
 }
 
 module.exports = {
