@@ -1,8 +1,7 @@
 const request = require('request');
 
-function formatDate(date) {
-  var split = date.split('-');
-  return split[split.length - 1] + '/' + split[1] + '/' + split[0];
+function normalizeDate(date) {
+  return data.split('-').reverse().join('/');
 }
 
 function gethtml(url) {
@@ -15,8 +14,8 @@ function gethtml(url) {
 }
 
 async function youtube(req, res, apikey) {
-  var ApiKey = req.query.apikey;
-  var text = req.query.text;
+  const ApiKey = req.query.apikey;
+  const text = req.query.text;
   if (!ApiKey) return res.send({
     status: false,
     message: 'apikey not defined'
@@ -30,8 +29,8 @@ async function youtube(req, res, apikey) {
     message: 'text is not defined'
   });
   async function start(query) {
-    var body = await gethtml(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`);
-    var infos = {
+    const body = await gethtml(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`);
+    const infos = {
       titles: [],
       videoIds: [],
       thumbnails: [],
@@ -58,26 +57,24 @@ async function youtube(req, res, apikey) {
         }
       }
     });
-
-    var body2 = await gethtml(`https://www.youtube.com/watch?v=${infos.videoIds[0]}`);
-    var data = JSON.parse(body2.match(/var ytInitialPlayerResponse = {(.+?)};/gi)[0].replace(/var ytInitialPlayerResponse = |;/gi, ''));
-    var reason;
-
+    const body2 = await gethtml(`https://www.youtube.com/watch?v=${infos.videoIds[0]}`);
+    const data = JSON.parse(body2.match(/var ytInitialPlayerResponse = {(.+?)};/gi)[0].replace(/var ytInitialPlayerResponse = |;/gi, ''));
+    let reason;
     if (data.hasOwnProperty('playabilityStatus')) {
       reason = data.playabilityStatus.status == 'ERROR';
     }
-    if (reason) return {
-      message: "video indisponível"
-    };
+    if (reason) return res.json({
+      message: 'video indisponível'
+    });
 
-    var object = {
+    const object = {
       videoId: infos.videoIds[0],
       title: infos.titles[0],
       source: 'https://youtu.be/' + infos.videoIds[0],
       thumbnail: infos.thumbnails[0],
       duration: infos.durations[0],
       views: infos.views[0],
-      publicationDate: formatDate(data.microformat.playerMicroformatRenderer.publishDate),
+      publicationDate: normalizeDate(data.microformat.playerMicroformatRenderer.publishDate),
       channel: {
         title: data.microformat.playerMicroformatRenderer.ownerChannelName,
         source: 'https://youtube.com/channel/' + data.microformat.playerMicroformatRenderer.externalChannelId,
