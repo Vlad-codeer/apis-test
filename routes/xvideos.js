@@ -50,9 +50,8 @@ function xvideos(req, res, apikey) {
           var reg = index.match(regExp2);
           var reg2 = index.match(regExp3);
           var reg3 = reg2[0].split('title=').join('').split('>').join('');
-          console.log(reg3);
           var obj = {
-            title: JSON.parse(reg3),
+            title: entities.decodeHTML5(JSON.parse(reg3)),
             url: 'https://www.xvideos.com' + JSON.parse(reg[0]),
           };
           xv.push(obj);
