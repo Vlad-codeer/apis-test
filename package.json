@@ -19,6 +19,10 @@
   ],
   "author": "CARLOS..-.",
   "license": "MIT",
+  "engines": {
+    "node": ">=18.0.1",
+    "npm": "<=8.12.0.1"
+  },
   "dependencies": {
     "axios": "^0.26.1",
     "express": "^4.17.3",
