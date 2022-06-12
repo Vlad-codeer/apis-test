@@ -95,7 +95,7 @@ function xvideos(req, res, apikey) {
 
           var obj = {
             owner: _ownerVideo,
-            title: _title,
+            title: entities.decodeHTML5(_title),
             url: _url_video_raw,
             duration: _duration,
             views: _views
