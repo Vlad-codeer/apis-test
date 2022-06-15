@@ -1,7 +1,7 @@
 const request = require('request');
 
 function normalizeDate(date) {
-  return data.split('-').reverse().join('/');
+  return date.split('-').reverse().join('/');
 }
 
 function gethtml(url) {
